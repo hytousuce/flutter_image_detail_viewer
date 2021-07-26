@@ -1,7 +1,5 @@
 library flutter_image_detail_viewer;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'src/localization/image_detail_viewer_text_delegate.dart';
+export 'src/settings/image_display_part_setting.dart';
+export 'src/type_tagged_image.dart';
