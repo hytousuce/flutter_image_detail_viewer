@@ -1,6 +1,4 @@
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_image_detail_viewer/flutter_image_detail_viewer.dart';
 import 'package:flutter_image_detail_viewer/src/utils/screen_utils.dart';
