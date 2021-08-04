@@ -27,6 +27,8 @@ class SingleImageDetailViewer extends StatefulWidget {
   final bool Function(ImageProvider image)? judgeGif;
   final Object? heroTag;
   final AnimationController? routerAnimationController;
+  final Function(bool value)? enablePageWarp;
+  final PageController? pageController;
 
   SingleImageDetailViewer({
     // this.isCustom = false,
@@ -44,6 +46,8 @@ class SingleImageDetailViewer extends StatefulWidget {
     this.judgeGif,
     this.heroTag,
     this.routerAnimationController,
+    this.enablePageWarp,
+    this.pageController,
   });
   // assert(isCustom || builder == null);
 
@@ -139,7 +143,8 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
           ImageType.animated,
         );
         scaleBoundary = ScaleBoundary.getBoundary(displayData!,
-            maxScale: widget.maxScale, minScale: widget.minScale);
+            maxScale: widget.maxScale ?? ImageComputedScale.cover * 1.5,
+            minScale: widget.minScale ?? ImageComputedScale.contain * 0.8);
         if (mounted) setState(() {});
         return;
       }
@@ -156,7 +161,8 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
           ImageType.animated,
         );
         scaleBoundary = ScaleBoundary.getBoundary(displayData!,
-            maxScale: widget.maxScale, minScale: widget.minScale);
+            maxScale: widget.maxScale ?? ImageComputedScale.cover * 1.5,
+            minScale: widget.minScale ?? ImageComputedScale.contain * 0.8);
         if (mounted) setState(() {});
         return;
       }
@@ -173,7 +179,8 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
             ImageType.animated,
           );
           scaleBoundary = ScaleBoundary.getBoundary(displayData!,
-              maxScale: widget.maxScale, minScale: widget.minScale);
+              maxScale: widget.maxScale ?? ImageComputedScale.cover * 1.5,
+              minScale: widget.minScale ?? ImageComputedScale.contain * 0.8);
           if (mounted) setState(() {});
           return;
         }
@@ -193,7 +200,8 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
             ImageType.animated,
           );
           scaleBoundary = ScaleBoundary.getBoundary(displayData!,
-              maxScale: widget.maxScale, minScale: widget.minScale);
+              maxScale: widget.maxScale ?? ImageComputedScale.cover * 1.5,
+              minScale: widget.minScale ?? ImageComputedScale.contain * 0.8);
           if (mounted) setState(() {});
           return;
         }
@@ -207,7 +215,8 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
       ImageType.normal,
     );
     scaleBoundary = ScaleBoundary.getBoundary(displayData!,
-        maxScale: widget.maxScale, minScale: widget.minScale);
+        maxScale: widget.maxScale ?? ImageComputedScale.cover * 1.5,
+        minScale: widget.minScale ?? ImageComputedScale.contain * 0.8);
     if (mounted) setState(() {});
     return;
   }
@@ -292,6 +301,70 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   late Offset startScalePointerOffset;
   late Offset scalePointerOldOffset;
   late bool disableDragToPop;
+  late bool enablePageDrag;
+  late double page;
+
+  void onHorizontalDragStart(DragStartDetails details) {
+    double panDxMaxValue = math.max(
+        0,
+        (displayData!.displaySize.width * controller.scale -
+                ScreenUtils.width) /
+            2);
+    enablePageDrag =
+        (controller.centerOffset.dx.abs() - panDxMaxValue).abs() < 10;
+    if (widget.pageController != null) {
+      page = widget.pageController!.page!;
+    }
+  }
+
+  void onHorizontalDragUpdate(DragUpdateDetails details) {
+    if (enablePageDrag && widget.pageController != null) {
+      widget.pageController!.jumpTo(
+          math.max(0, widget.pageController!.offset - details.delta.dx));
+    } else {
+      double panDxMaxValue = math.max(
+          0,
+          (displayData!.displaySize.width * controller.scale -
+                  ScreenUtils.width) /
+              2);
+      double panDyMaxValue = math.max(
+          0,
+          (displayData!.displaySize.height * controller.scale -
+                  ScreenUtils.height) /
+              2);
+      Offset offsetWillbeValue =
+          controller.centerOffset + (details.delta * controller.scale);
+      controller.centerOffset = Offset(
+          math.max(
+              -panDxMaxValue, math.min(panDxMaxValue, offsetWillbeValue.dx)),
+          math.max(
+              -panDyMaxValue, math.min(panDyMaxValue, offsetWillbeValue.dy)));
+    }
+  }
+
+  void onHorizontalDragEnd(DragEndDetails details) {
+    if (widget.pageController != null && enablePageDrag) {
+      if (widget.pageController!.offset + -details.velocity.pixelsPerSecond.dx >
+          ScreenUtils.width * (page + 0.5)) {
+        widget.pageController!.animateToPage(page.floor() + 1,
+            duration: Duration(milliseconds: 250), curve: Curves.easeOut);
+      } else if (widget.pageController!.offset +
+              -details.velocity.pixelsPerSecond.dx <
+          ScreenUtils.width * (page - 0.5)) {
+        widget.pageController!.animateToPage(page.floor() - 1,
+            duration: Duration(milliseconds: 250), curve: Curves.easeOut);
+      } else if (widget.pageController!.offset <= 0) {
+        widget.pageController!.animateToPage(0,
+            duration: Duration(milliseconds: 250), curve: Curves.easeOut);
+      } else if (widget.pageController!.offset >
+          ScreenUtils.width * widget.pageController!.positions.length) {
+        widget.pageController!.animateToPage(
+            widget.pageController!.positions.length,
+            duration: Duration(milliseconds: 250),
+            curve: Curves.easeOut);
+      }
+    }
+  }
 
   void onScaleStart(ScaleStartDetails details) {
     controllerScaleOldValue = controller.value.scale;
@@ -302,11 +375,22 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
         (displayData!.displaySize.height * controller.scale -
                 ScreenUtils.height) /
             2);
-    print("$panDyMaxValue, ${controller.centerOffset.dy.abs()}");
     if ((controller.centerOffset.dy.abs() - panDyMaxValue).abs() < 10)
       disableDragToPop = false;
     else
       disableDragToPop = true;
+    double panDxMaxValue = math.max(
+        0,
+        (displayData!.displaySize.width * controller.scale -
+                ScreenUtils.width) /
+            2);
+    if (widget.enablePageWarp != null) {
+      print("~~~${(controller.centerOffset.dx.abs() - panDxMaxValue).abs()}");
+      if ((controller.centerOffset.dx.abs() - panDxMaxValue).abs() < 10)
+        widget.enablePageWarp!.call(true);
+      else
+        widget.enablePageWarp!.call(false);
+    }
   }
 
   void onScaleUpdate(ScaleUpdateDetails details) {
@@ -317,6 +401,7 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
         scaleBoundary.minScale,
         math.min(
             scaleBoundary.maxScale, controllerScaleOldValue * details.scale));
+    print("${scaleBoundary.minScale}, ${scaleBoundary.maxScale}");
     if (controller.scale != 1.0) {
       state = controller.scale > 1.0
           ? ImageDetailViewerScaleState.zoomedIn
@@ -327,7 +412,6 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
         (displayData!.displaySize.height * controller.scale -
                 ScreenUtils.height) /
             2);
-    print(panDyMaxValue);
 
     if (state == ImageDetailViewerScaleState.initial &&
         widget.routerAnimationController != null &&
@@ -352,10 +436,17 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   }
 
   void Function(ScaleEndDetails) onScaleEnd(BuildContext context) {
-    return (_) {
+    return (details) {
+      double dragVelocity = details.velocity.pixelsPerSecond.dy;
+      print("~~~${dragVelocity / ScreenUtils.height / 20}");
       if (state == ImageDetailViewerScaleState.initial &&
           widget.routerAnimationController != null &&
-          (widget.routerAnimationController!.value - 0.5).abs() > 0.1) {
+          widget.routerAnimationController!.value != 0.5 &&
+          (widget.routerAnimationController!.value +
+                      (dragVelocity / ScreenUtils.height / 10) -
+                      0.5)
+                  .abs() >
+              0.1) {
         widget.routerAnimationController!
             .animateTo(widget.routerAnimationController!.value > 0.5 ? 1 : 0);
         Navigator.pop(context);
@@ -420,49 +511,6 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
     doubleTapScaleAnimationController!.forward(from: 0);
   }
 
-  void onPanUpdate(DragUpdateDetails details) {
-    if (displayData == null) return;
-    double panDyMaxValue = math.max(
-        0,
-        (displayData!.displaySize.height -
-                ScreenUtils.height / controller.scale) /
-            2);
-
-    if (state == ImageDetailViewerScaleState.initial &&
-        widget.routerAnimationController != null &&
-        ((controller.centerOffset.dy + details.delta.dy).abs() >
-                panDyMaxValue ||
-            widget.routerAnimationController!.value != 0.5)) {
-      widget.routerAnimationController!.value -=
-          details.delta.dy / ScreenUtils.height / 2;
-      return;
-    }
-    double panDxMaxValue = ((displayData!.displaySize.width -
-                ScreenUtils.width / controller.scale) /
-            2)
-        .abs();
-    Offset offsetWillbeValue =
-        controller.centerOffset + (details.delta / controller.scale);
-    controller.centerOffset = Offset(
-        math.max(-panDxMaxValue, math.min(panDxMaxValue, offsetWillbeValue.dx)),
-        math.max(
-            -panDyMaxValue, math.min(panDyMaxValue, offsetWillbeValue.dy)));
-  }
-
-  void Function(DragEndDetails) onPanEnd(BuildContext context) {
-    return (_) {
-      if (state == ImageDetailViewerScaleState.initial &&
-          widget.routerAnimationController != null &&
-          (widget.routerAnimationController!.value - 0.5).abs() > 0.1) {
-        widget.routerAnimationController!
-            .animateTo(widget.routerAnimationController!.value > 0.5 ? 1 : 0);
-        Navigator.pop(context);
-      } else if (widget.routerAnimationController != null) {
-        widget.routerAnimationController!.animateTo(0.5);
-      }
-    };
-  }
-
   VoidCallback onTap(BuildContext context) {
     return () {
       if (widget.routerAnimationController != null) {
@@ -494,7 +542,10 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
 
     if (widget.enableGestures) {
       imageWarapper = GestureDetector(
-        behavior: HitTestBehavior.opaque,
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: onHorizontalDragStart,
+        onHorizontalDragUpdate: onHorizontalDragUpdate,
+        onHorizontalDragEnd: onHorizontalDragEnd,
         onDoubleTap: onDoubleTap,
         onScaleStart: onScaleStart,
         onScaleUpdate: onScaleUpdate,

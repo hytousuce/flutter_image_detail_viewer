@@ -60,7 +60,6 @@ class ScaleBoundary {
                   minScaleComputed.multiplicator,
             ),
           );
-          print("~~~${imageDisplayData.containScaleValue}");
         }
       }
     }

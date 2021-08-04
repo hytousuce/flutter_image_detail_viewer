@@ -79,7 +79,6 @@ class _SingleImageLayoutDelegate extends SingleChildLayoutDelegate {
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
-    // TODO: implement getConstraintsForChild
     return BoxConstraints(
         minWidth: constraints.minWidth,
         maxWidth: constraints.maxWidth,

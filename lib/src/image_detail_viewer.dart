@@ -84,6 +84,16 @@ class ImageDetailViewer extends StatefulWidget {
 class _ImageDetailViewerState extends State<ImageDetailViewer> {
   late PageController _pageController;
   List<SingleImageDetailViewer> pageChildren = [];
+  bool disablePageWarp = false;
+
+  void enablePageWarp(bool value) {
+    bool newValue = !value;
+    if (newValue != disablePageWarp) {
+      disablePageWarp = newValue;
+      print(newValue);
+      setState(() {});
+    }
+  }
 
   @override
   void initState() {
@@ -118,6 +128,8 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
           enableGestures: item.enableGestures,
           heroTag: item.heroTag,
           routerAnimationController: widget.routerAnimationController,
+          enablePageWarp: enablePageWarp,
+          pageController: _pageController,
         ));
       } else {
         // assert(item.customBuilder != null);
@@ -141,7 +153,10 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
   Widget build(BuildContext context) {
     return PageView(
       scrollDirection: widget.scrollDirection ?? Axis.horizontal,
-      physics: widget.scrollPhysics,
+      // physics: disablePageWarp
+      //     ? NeverScrollableScrollPhysics()
+      //     : widget.scrollPhysics,
+      physics: NeverScrollableScrollPhysics(),
       controller: _pageController,
       children: pageChildren,
     );
