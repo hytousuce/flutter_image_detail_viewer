@@ -16,6 +16,8 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
   final Axis? scrollDirection;
   final Widget Function(BuildContext context)? frontWidgetBuilder;
   final double blurMaxValue;
+  final void Function(int)? onPageChanged;
+  final int initialPage;
   final Key? key;
 
   ImageDetailViewerBlurPageRouter({
@@ -27,6 +29,8 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
     this.key,
     this.frontWidgetBuilder,
     this.blurMaxValue = 40,
+    this.onPageChanged,
+    this.initialPage = 0,
     RouteSettings? routeSettings,
   })  : itemCount = null,
         builder = null,
@@ -42,6 +46,8 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
     this.frontWidgetBuilder,
     this.key,
     this.blurMaxValue = 40,
+    this.onPageChanged,
+    this.initialPage = 0,
     RouteSettings? routeSettings,
   })  : options = null,
         super(settings: routeSettings);

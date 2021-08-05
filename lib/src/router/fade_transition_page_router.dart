@@ -14,6 +14,8 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
   final ScrollPhysics? scrollPhysics;
   final Axis? scrollDirection;
   final Widget Function(BuildContext context)? frontWidgetBuilder;
+  final void Function(int)? onPageChanged;
+  final int initialPage;
   final Key? key;
 
   ImageDetailViewerFadePageRouter({
@@ -24,6 +26,8 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
     this.scrollDirection,
     this.key,
     this.frontWidgetBuilder,
+    this.onPageChanged,
+    this.initialPage = 0,
     RouteSettings? routeSettings,
   })  : itemCount = null,
         builder = null,
@@ -38,6 +42,8 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
     this.scrollPhysics,
     this.frontWidgetBuilder,
     this.key,
+    this.onPageChanged,
+    this.initialPage = 0,
     RouteSettings? routeSettings,
   })  : options = null,
         super(settings: routeSettings);
