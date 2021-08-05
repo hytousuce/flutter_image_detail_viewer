@@ -85,6 +85,8 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
         routerAnimationController: barrierAnimationController,
         scrollPhysics: scrollPhysics,
         scrollDirection: scrollDirection,
+        onPageChanged: onPageChanged,
+        initialPage: initialPage,
         key: key,
       );
     } else {
@@ -95,6 +97,8 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
         routerAnimationController: barrierAnimationController,
         scrollDirection: scrollDirection,
         scrollPhysics: scrollPhysics,
+        onPageChanged: onPageChanged,
+        initialPage: initialPage,
         key: key,
       );
     }
@@ -103,7 +107,6 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
           child: AnimatedBuilder(
         animation: barrierAnimation,
         builder: (context, child) {
-          print("~~~${(1 - barrierAnimation.value.abs()) * blurMaxValue}");
           return Stack(
             children: [
               Positioned.fill(

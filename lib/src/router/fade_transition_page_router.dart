@@ -82,6 +82,8 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
         routerAnimationController: barrierAnimationController,
         scrollPhysics: scrollPhysics,
         scrollDirection: scrollDirection,
+        onPageChanged: onPageChanged,
+        initialPage: initialPage,
         key: key,
       );
     } else {
@@ -92,6 +94,8 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
         routerAnimationController: barrierAnimationController,
         scrollDirection: scrollDirection,
         scrollPhysics: scrollPhysics,
+        onPageChanged: onPageChanged,
+        initialPage: initialPage,
         key: key,
       );
     }

@@ -105,7 +105,12 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
   void initState() {
     super.initState();
     if (widget.pageController != null) {
-      _pageController = widget.pageController!..jumpToPage(widget.initialPage);
+      if (widget.pageController!.initialPage != widget.initialPage) {
+        _pageController = widget.pageController!
+          ..jumpToPage(widget.initialPage);
+      } else {
+        _pageController = widget.pageController!;
+      }
     } else
       _pageController = PageController(initialPage: widget.initialPage);
   }
@@ -168,6 +173,7 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
       //     ? NeverScrollableScrollPhysics()
       //     : widget.scrollPhysics,
       physics: NeverScrollableScrollPhysics(),
+      pageSnapping: false,
       controller: _pageController,
       children: pageChildren,
     );
