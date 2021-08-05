@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_image_detail_viewer/src/image_detail_viewer.dart';
@@ -50,7 +49,6 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
   String? get barrierLabel => null;
 
   @override
-  // TODO: implement opaque
   bool get opaque => false;
 
   @override
@@ -146,8 +144,8 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
   bool get maintainState => false;
 
   @override
-  Duration get transitionDuration => Duration(milliseconds: 250);
+  Duration get transitionDuration => Duration(milliseconds: 500);
 
   @override
-  Duration get reverseTransitionDuration => Duration(milliseconds: 200);
+  Duration get reverseTransitionDuration => Duration(milliseconds: 250);
 }

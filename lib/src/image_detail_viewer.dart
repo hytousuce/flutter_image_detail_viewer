@@ -90,7 +90,6 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
     bool newValue = !value;
     if (newValue != disablePageWarp) {
       disablePageWarp = newValue;
-      print(newValue);
       setState(() {});
     }
   }
@@ -130,6 +129,7 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
           routerAnimationController: widget.routerAnimationController,
           enablePageWarp: enablePageWarp,
           pageController: _pageController,
+          pagesNum: optionList.length,
         ));
       } else {
         // assert(item.customBuilder != null);
@@ -172,6 +172,7 @@ Future<T?> showImageDetailViewer<T>(
   ScrollPhysics? scrollPhysics,
   Axis? scrollDirection,
   Key? key,
+  double? blurMaxValue,
   Widget Function(BuildContext)? frontWidgetBuilder,
   RouteSettings? settings,
 }) {
@@ -190,7 +191,17 @@ Future<T?> showImageDetailViewer<T>(
       );
       break;
     case ImageDetailViewerRouters.blurTransition:
-      usingRouter = ImageDetailViewerBlurPageRouter<T>();
+      usingRouter = ImageDetailViewerBlurPageRouter<T>(
+        options: options,
+        pageController: pageController,
+        routerAnimationController: animationController,
+        scrollPhysics: scrollPhysics,
+        scrollDirection: scrollDirection,
+        key: key,
+        frontWidgetBuilder: frontWidgetBuilder,
+        blurMaxValue: blurMaxValue ?? 40.0,
+        routeSettings: settings,
+      );
       break;
   }
   return Navigator.of(context).push(usingRouter);

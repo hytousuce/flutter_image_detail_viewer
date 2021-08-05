@@ -103,30 +103,34 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             InkWell(
               onTap: () {
-                showImageDetailViewer(context, options: [
-                  ImageDetailViewerOption(image: NetworkImage(
-                      // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
-                      // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'))
-                      'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe')),
-                  ImageDetailViewerOption(image: NetworkImage(
-                      // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
-                      'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84')),
-                  // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe')),
-                  ImageDetailViewerOption(
-                      image: NetworkImage(
-                          'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
-                  // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'))
-                  // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'))
-                ]);
+                showImageDetailViewer(context,
+                    routers: ImageDetailViewerRouters.blurTransition,
+                    options: [
+                      ImageDetailViewerOption(
+                        image: NetworkImage(
+                            'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'),
+                        // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'))
+                        // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'),
+                      ),
+                      ImageDetailViewerOption(image: NetworkImage(
+                          // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
+                          'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84')),
+                      // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe')),
+                      ImageDetailViewerOption(image: NetworkImage(
+                          // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
+                          // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'))
+                          'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'))
+                    ]);
               },
               child: TypeTaggedImage(
                 image: NetworkImage(
-                    // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'),
-                    // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'),
-                    'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'),
+                    'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'),
+                // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'),
+                // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'),
                 height: 200,
                 width: 300,
                 fit: BoxFit.cover,
+                heroTag: 1,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                 ),

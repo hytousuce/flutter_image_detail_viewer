@@ -6,6 +6,7 @@ import 'package:flutter_image_detail_viewer/src/component/single_image_wrapper.d
 import 'package:flutter_image_detail_viewer/src/controller/image_detail_viewer_controller.dart';
 import 'package:flutter_image_detail_viewer/src/data/image_display_data.dart';
 import 'package:flutter_image_detail_viewer/src/data/scale_boundary.dart';
+import 'package:flutter_image_detail_viewer/src/enum/enable_page_drag_direction.dart';
 import 'package:flutter_image_detail_viewer/src/enum/image_detail_viewer_scale_state.dart';
 import 'package:flutter_image_detail_viewer/src/enum/image_type.dart';
 import 'package:flutter_image_detail_viewer/src/utils/image_computed_scale.dart';
@@ -29,6 +30,7 @@ class SingleImageDetailViewer extends StatefulWidget {
   final AnimationController? routerAnimationController;
   final Function(bool value)? enablePageWarp;
   final PageController? pageController;
+  final int pagesNum;
 
   SingleImageDetailViewer({
     // this.isCustom = false,
@@ -48,6 +50,7 @@ class SingleImageDetailViewer extends StatefulWidget {
     this.routerAnimationController,
     this.enablePageWarp,
     this.pageController,
+    required this.pagesNum,
   });
   // assert(isCustom || builder == null);
 
@@ -57,7 +60,7 @@ class SingleImageDetailViewer extends StatefulWidget {
 }
 
 class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   ImageStream? _imageStream;
   bool _isListeningToStream = false;
   ImageChunkEvent? _loadingProgress;
@@ -292,6 +295,12 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
     assert(_imageStream != null);
     _stopListeningToStream();
     _completerHandle?.dispose();
+    if (dragAnimationController != null) {
+      dragAnimationController!.dispose();
+    }
+    if (doubleTapScaleAnimationController != null) {
+      doubleTapScaleAnimationController!.dispose();
+    }
     super.dispose();
   }
 
@@ -301,8 +310,9 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   late Offset startScalePointerOffset;
   late Offset scalePointerOldOffset;
   late bool disableDragToPop;
-  late bool enablePageDrag;
+  late EnablePageDragDirection enablePageDrag;
   late double page;
+  late double originScrollOffset;
 
   void onHorizontalDragStart(DragStartDetails details) {
     double panDxMaxValue = math.max(
@@ -310,46 +320,69 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
         (displayData!.displaySize.width * controller.scale -
                 ScreenUtils.width) /
             2);
-    enablePageDrag =
-        (controller.centerOffset.dx.abs() - panDxMaxValue).abs() < 10;
+    if (controller.centerOffset.dx >= 0) {
+      enablePageDrag = panDxMaxValue - controller.centerOffset.dx < 10
+          ? EnablePageDragDirection.left
+          : EnablePageDragDirection.none;
+    } else {
+      enablePageDrag = controller.centerOffset.dx + panDxMaxValue > -10
+          ? EnablePageDragDirection.right
+          : EnablePageDragDirection.none;
+    }
     if (widget.pageController != null) {
       page = widget.pageController!.page!;
+      originScrollOffset = widget.pageController!.offset;
+    }
+    if (dragAnimationController != null) {
+      dragAnimationController!.stop();
     }
   }
 
   void onHorizontalDragUpdate(DragUpdateDetails details) {
-    if (enablePageDrag && widget.pageController != null) {
-      widget.pageController!.jumpTo(
-          math.max(0, widget.pageController!.offset - details.delta.dx));
-    } else {
-      double panDxMaxValue = math.max(
-          0,
-          (displayData!.displaySize.width * controller.scale -
-                  ScreenUtils.width) /
-              2);
-      double panDyMaxValue = math.max(
-          0,
-          (displayData!.displaySize.height * controller.scale -
-                  ScreenUtils.height) /
-              2);
-      Offset offsetWillbeValue =
-          controller.centerOffset + (details.delta * controller.scale);
-      controller.centerOffset = Offset(
-          math.max(
-              -panDxMaxValue, math.min(panDxMaxValue, offsetWillbeValue.dx)),
-          math.max(
-              -panDyMaxValue, math.min(panDyMaxValue, offsetWillbeValue.dy)));
+    if (enablePageDrag != EnablePageDragDirection.none &&
+        widget.pageController != null) {
+      if (enablePageDrag == EnablePageDragDirection.left &&
+          details.delta.dx > 0) {
+        widget.pageController!.jumpTo(math.min(
+            (widget.pagesNum - 1) * ScreenUtils.width,
+            math.max(0, widget.pageController!.offset - details.delta.dx)));
+        return;
+      } else if (enablePageDrag == EnablePageDragDirection.right &&
+          details.delta.dx < 0) {
+        widget.pageController!.jumpTo(math.min(
+            (widget.pagesNum - 1) * ScreenUtils.width,
+            math.max(0, widget.pageController!.offset - details.delta.dx)));
+        return;
+      }
     }
+    double panDxMaxValue = math.max(
+        0,
+        (displayData!.displaySize.width * controller.scale -
+                ScreenUtils.width) /
+            2);
+    double panDyMaxValue = math.max(
+        0,
+        (displayData!.displaySize.height * controller.scale -
+                ScreenUtils.height) /
+            2);
+    Offset offsetWillbeValue =
+        controller.centerOffset + (details.delta * controller.scale);
+    controller.centerOffset = Offset(
+        math.max(-panDxMaxValue, math.min(panDxMaxValue, offsetWillbeValue.dx)),
+        math.max(
+            -panDyMaxValue, math.min(panDyMaxValue, offsetWillbeValue.dy)));
   }
 
   void onHorizontalDragEnd(DragEndDetails details) {
-    if (widget.pageController != null && enablePageDrag) {
-      if (widget.pageController!.offset + -details.velocity.pixelsPerSecond.dx >
+    if (widget.pageController != null &&
+        enablePageDrag != EnablePageDragDirection.none) {
+      if (widget.pageController!.offset +
+              -details.velocity.pixelsPerSecond.dx / 10 >
           ScreenUtils.width * (page + 0.5)) {
         widget.pageController!.animateToPage(page.floor() + 1,
             duration: Duration(milliseconds: 250), curve: Curves.easeOut);
       } else if (widget.pageController!.offset +
-              -details.velocity.pixelsPerSecond.dx <
+              -details.velocity.pixelsPerSecond.dx / 10 <
           ScreenUtils.width * (page - 0.5)) {
         widget.pageController!.animateToPage(page.floor() - 1,
             duration: Duration(milliseconds: 250), curve: Curves.easeOut);
@@ -357,11 +390,9 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
         widget.pageController!.animateToPage(0,
             duration: Duration(milliseconds: 250), curve: Curves.easeOut);
       } else if (widget.pageController!.offset >
-          ScreenUtils.width * widget.pageController!.positions.length) {
-        widget.pageController!.animateToPage(
-            widget.pageController!.positions.length,
-            duration: Duration(milliseconds: 250),
-            curve: Curves.easeOut);
+          ScreenUtils.width * widget.pagesNum) {
+        widget.pageController!.animateToPage(widget.pagesNum - 1,
+            duration: Duration(milliseconds: 250), curve: Curves.easeOut);
       }
     }
   }
@@ -379,17 +410,9 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
       disableDragToPop = false;
     else
       disableDragToPop = true;
-    double panDxMaxValue = math.max(
-        0,
-        (displayData!.displaySize.width * controller.scale -
-                ScreenUtils.width) /
-            2);
-    if (widget.enablePageWarp != null) {
-      print("~~~${(controller.centerOffset.dx.abs() - panDxMaxValue).abs()}");
-      if ((controller.centerOffset.dx.abs() - panDxMaxValue).abs() < 10)
-        widget.enablePageWarp!.call(true);
-      else
-        widget.enablePageWarp!.call(false);
+
+    if (dragAnimationController != null) {
+      dragAnimationController!.stop();
     }
   }
 
@@ -401,7 +424,6 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
         scaleBoundary.minScale,
         math.min(
             scaleBoundary.maxScale, controllerScaleOldValue * details.scale));
-    print("${scaleBoundary.minScale}, ${scaleBoundary.maxScale}");
     if (controller.scale != 1.0) {
       state = controller.scale > 1.0
           ? ImageDetailViewerScaleState.zoomedIn
@@ -438,26 +460,61 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   void Function(ScaleEndDetails) onScaleEnd(BuildContext context) {
     return (details) {
       double dragVelocity = details.velocity.pixelsPerSecond.dy;
-      print("~~~${dragVelocity / ScreenUtils.height / 20}");
       if (state == ImageDetailViewerScaleState.initial &&
           widget.routerAnimationController != null &&
-          widget.routerAnimationController!.value != 0.5 &&
-          (widget.routerAnimationController!.value +
-                      (dragVelocity / ScreenUtils.height / 10) -
-                      0.5)
-                  .abs() >
-              0.1) {
-        widget.routerAnimationController!
-            .animateTo(widget.routerAnimationController!.value > 0.5 ? 1 : 0);
-        Navigator.pop(context);
-      } else if (widget.routerAnimationController != null) {
-        widget.routerAnimationController!.animateTo(0.5);
+          widget.routerAnimationController!.value != 0.5) {
+        if ((widget.routerAnimationController!.value +
+                    (dragVelocity / ScreenUtils.height / 10) -
+                    0.5)
+                .abs() >
+            0.1) {
+          widget.routerAnimationController!.animateTo(
+              widget.routerAnimationController!.value > 0.5 ? 1 : 0,
+              duration: widget.routerAnimationController!.reverseDuration);
+          Navigator.pop(context);
+        } else {
+          widget.routerAnimationController!.animateTo(0.5,
+              duration: widget.routerAnimationController!.reverseDuration);
+        }
+      }
+      if (dragAnimationController != null) {
+        Offset velocity = details.velocity.pixelsPerSecond;
+        Offset willbeOffset = controller.centerOffset + (velocity / 2);
+        double panDyMaxValue = math.max(
+            0,
+            (displayData!.displaySize.height * controller.scale -
+                    ScreenUtils.height) /
+                2);
+        double panDxMaxValue = math.max(
+            0,
+            (displayData!.displaySize.width * controller.scale -
+                    ScreenUtils.width) /
+                2);
+        dragAnimation = Tween<Offset>(
+                begin: controller.centerOffset, end: willbeOffset)
+            .animate(CurvedAnimation(
+                parent: dragAnimationController!, curve: Curves.decelerate))
+              ..addListener(() {
+                if (dragAnimation != null) {
+                  // Offset centerOffsetOldValue = controller.centerOffset;
+                  controller.centerOffset = Offset(
+                      math.max(-panDxMaxValue,
+                          math.min(panDxMaxValue, dragAnimation!.value.dx)),
+                      math.max(-panDyMaxValue,
+                          math.min(panDyMaxValue, dragAnimation!.value.dy)));
+                  // if (centerOffsetOldValue == controller.centerOffset)
+                  //   dragAnimationController!.stop();
+                }
+              });
+        dragAnimationController!.forward(from: 0);
       }
     };
   }
 
   Animation? doubleTapScaleAnimation;
   AnimationController? doubleTapScaleAnimationController;
+  Animation<Offset>? dragAnimation;
+  AnimationController? dragAnimationController;
 
   void onDoubleTap() {
     if (doubleTapScaleAnimationController == null) {
@@ -525,6 +582,8 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
     super.initState();
     doubleTapScaleAnimationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 250));
+    dragAnimationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
   }
 
   @override

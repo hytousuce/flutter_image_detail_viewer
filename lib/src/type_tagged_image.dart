@@ -46,6 +46,10 @@ class TypeTaggedImage extends StatefulWidget {
   /// 本 Widget 第一层的 [Container] 的 `clipBehavior`
   final Clip? clipBehavior;
 
+  /// The tag for [Hero] widget.
+  /// [Hero] 动画的标签
+  final Object? heroTag;
+
   /// Function to judge whether the given image is a gif image.
   /// 判断图片是否为 GIF 的方法。
   ///
@@ -144,6 +148,7 @@ class TypeTaggedImage extends StatefulWidget {
     this.gaplessPlayback,
     this.isAntiAlias,
     this.filterQuality,
+    this.heroTag,
   }) : super(key: key);
 
   @override
@@ -373,6 +378,9 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
       isAntiAlias: widget.isAntiAlias ?? false,
       filterQuality: widget.filterQuality ?? FilterQuality.low,
     );
+    if (widget.heroTag != null) {
+      image = Hero(tag: widget.heroTag!, child: image);
+    }
     if (widget.loadingBuilder != null)
       image = widget.loadingBuilder!(context, image, _loadingProgress);
     return Container(
