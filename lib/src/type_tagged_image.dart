@@ -1,9 +1,9 @@
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_image_detail_viewer/flutter_image_detail_viewer.dart';
 import 'package:flutter_image_detail_viewer/src/utils/screen_utils.dart';
+
+import 'enum/image_type.dart';
 
 /// An image Widget which supports displaying a image type (piiic, gif, etc.)
 /// tag at the bottom-left corner in default and custom image display part
@@ -45,6 +45,10 @@ class TypeTaggedImage extends StatefulWidget {
   /// The `clipBehavior` for [Container] widget of the child of this widget.
   /// 本 Widget 第一层的 [Container] 的 `clipBehavior`
   final Clip? clipBehavior;
+
+  /// The tag for [Hero] widget.
+  /// [Hero] 动画的标签
+  final Object? heroTag;
 
   /// Function to judge whether the given image is a gif image.
   /// 判断图片是否为 GIF 的方法。
@@ -144,6 +148,7 @@ class TypeTaggedImage extends StatefulWidget {
     this.gaplessPlayback,
     this.isAntiAlias,
     this.filterQuality,
+    this.heroTag,
   }) : super(key: key);
 
   @override
@@ -151,7 +156,7 @@ class TypeTaggedImage extends StatefulWidget {
 }
 
 class _TypeTaggedImageState extends State<TypeTaggedImage> {
-  _ImageType _imageType = _ImageType.normal;
+  ImageType _imageType = ImageType.normal;
   ImageStream? _imageStream;
   ImageInfo? _imageInfo;
   ImageChunkEvent? _loadingProgress;
@@ -191,14 +196,14 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
       // 通过用户提供的方法实现了
       if (mounted)
         setState(() {
-          _imageType = _ImageType.animated;
+          _imageType = ImageType.animated;
         });
       return;
     } else if (widget.image is NetworkImage) {
       if ((widget.image as NetworkImage).url.toLowerCase().contains('.gif')) {
         if (mounted)
           setState(() {
-            _imageType = _ImageType.animated;
+            _imageType = ImageType.animated;
           });
         return;
       }
@@ -209,7 +214,7 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
           .contains('.gif')) {
         if (mounted)
           setState(() {
-            _imageType = _ImageType.animated;
+            _imageType = ImageType.animated;
           });
         return;
       }
@@ -220,7 +225,7 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
         if (codec.frameCount >= 1) {
           if (mounted)
             setState(() {
-              _imageType = _ImageType.animated;
+              _imageType = ImageType.animated;
             });
           return;
         }
@@ -234,7 +239,7 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
             .endsWith('.gif')) {
           if (mounted) {
             setState(() {
-              _imageType = _ImageType.animated;
+              _imageType = ImageType.animated;
             });
           }
           return;
@@ -246,11 +251,11 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
     if (height / width > ScreenUtils.ratio) {
       if (mounted)
         setState(() {
-          _imageType = _ImageType.piiic;
+          _imageType = ImageType.piiic;
         });
       return;
     }
-    _imageType = _ImageType.normal;
+    _imageType = ImageType.normal;
     return;
   }
 
@@ -373,6 +378,9 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
       isAntiAlias: widget.isAntiAlias ?? false,
       filterQuality: widget.filterQuality ?? FilterQuality.low,
     );
+    if (widget.heroTag != null) {
+      image = Hero(tag: widget.heroTag!, child: image);
+    }
     if (widget.loadingBuilder != null)
       image = widget.loadingBuilder!(context, image, _loadingProgress);
     return Container(
@@ -391,13 +399,13 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
               widget.textDelegate ?? ChineseImageDetailViewerTextDelegate();
           late String tagString;
           switch (_imageType) {
-            case _ImageType.animated:
+            case ImageType.animated:
               tagString = textDelegate.animatedPicture;
               break;
-            case _ImageType.piiic:
+            case ImageType.piiic:
               tagString = textDelegate.piiic;
               break;
-            case _ImageType.normal:
+            case ImageType.normal:
               tagString = "";
               break;
           }
@@ -414,7 +422,7 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
                 left: tagToLeft,
                 bottom: tagToBottom,
                 child: Offstage(
-                  offstage: _imageType == _ImageType.normal,
+                  offstage: _imageType == ImageType.normal,
                   child: widget.tagBuilder == null
                       ? Container(
                           decoration: BoxDecoration(
@@ -433,15 +441,4 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
       ),
     );
   }
-}
-
-enum _ImageType {
-  /// Long Picture 长图
-  piiic,
-
-  /// Animated Picture 动图
-  animated,
-
-  /// Normal Picture 一般图片
-  normal,
 }
