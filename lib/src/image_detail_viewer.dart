@@ -34,6 +34,10 @@ class ImageDetailViewer extends StatefulWidget {
   /// 控制插件内 [PageView] 的控制器。
   final PageController? pageController;
 
+  final int initialPage;
+
+  final void Function(int)? onPageChanged;
+
   /// An animation Controller to controll the animation for router transition.
   /// 一个控制路由过渡动画的控制器。
   ///
@@ -61,6 +65,8 @@ class ImageDetailViewer extends StatefulWidget {
     this.routerAnimationController,
     this.scrollPhysics,
     this.scrollDirection,
+    this.initialPage = 0,
+    this.onPageChanged,
   })  : itemCount = null,
         builder = null,
         super(key: key);
@@ -73,6 +79,8 @@ class ImageDetailViewer extends StatefulWidget {
     this.routerAnimationController,
     this.scrollDirection,
     this.scrollPhysics,
+    this.initialPage = 0,
+    this.onPageChanged,
   })  : options = null,
         super(key: key);
 
@@ -96,7 +104,10 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
   @override
   void initState() {
     super.initState();
-    _pageController = widget.pageController ?? PageController();
+    if (widget.pageController != null) {
+      _pageController = widget.pageController!..jumpToPage(widget.initialPage);
+    } else
+      _pageController = PageController(initialPage: widget.initialPage);
   }
 
   @override
@@ -151,6 +162,7 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
   @override
   Widget build(BuildContext context) {
     return PageView(
+      onPageChanged: widget.onPageChanged,
       scrollDirection: widget.scrollDirection ?? Axis.horizontal,
       // physics: disablePageWarp
       //     ? NeverScrollableScrollPhysics()
@@ -173,6 +185,8 @@ Future<T?> showImageDetailViewer<T>(
   Key? key,
   double? blurMaxValue,
   Widget Function(BuildContext)? frontWidgetBuilder,
+  void Function(int)? onPageChanged,
+  int? initialPage,
   RouteSettings? settings,
 }) {
   late PageRoute<T> usingRouter;
@@ -185,6 +199,8 @@ Future<T?> showImageDetailViewer<T>(
         scrollPhysics: scrollPhysics,
         scrollDirection: scrollDirection,
         key: key,
+        initialPage: initialPage ?? 0,
+        onPageChanged: onPageChanged,
         frontWidgetBuilder: frontWidgetBuilder,
         routeSettings: settings,
       );
@@ -199,6 +215,8 @@ Future<T?> showImageDetailViewer<T>(
         key: key,
         frontWidgetBuilder: frontWidgetBuilder,
         blurMaxValue: blurMaxValue ?? 40.0,
+        initialPage: initialPage ?? 0,
+        onPageChanged: onPageChanged,
         routeSettings: settings,
       );
       break;
