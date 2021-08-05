@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_detail_viewer/flutter_image_detail_viewer.dart';
-import 'package:flutter_image_detail_viewer/src/option/image_detail_viewer_option.dart';
 import 'package:flutter_image_detail_viewer/src/router/blur_transition_page_router.dart';
 import 'package:flutter_image_detail_viewer/src/router/fade_transition_page_router.dart';
 
