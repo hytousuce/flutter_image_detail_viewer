@@ -339,43 +339,25 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   }
 
   void onHorizontalDragUpdate(DragUpdateDetails details) {
-    if (enablePageDrag != EnablePageDragDirection.none &&
-        widget.pageController != null) {
-      if (enablePageDrag == EnablePageDragDirection.left &&
-          details.delta.dx > 0) {
-        widget.pageController!.jumpTo(math.min(
-            (widget.pagesNum - 1) * ScreenUtils.width,
-            math.max(0, widget.pageController!.offset - details.delta.dx)));
-        return;
-      } else if (enablePageDrag == EnablePageDragDirection.right &&
-          details.delta.dx < 0) {
-        widget.pageController!.jumpTo(math.min(
-            (widget.pagesNum - 1) * ScreenUtils.width,
-            math.max(0, widget.pageController!.offset - details.delta.dx)));
-        return;
-      }
-    }
     double panDxMaxValue = math.max(
         0,
         (displayData!.displaySize.width * controller.scale -
                 ScreenUtils.width) /
             2);
-    double panDyMaxValue = math.max(
-        0,
-        (displayData!.displaySize.height * controller.scale -
-                ScreenUtils.height) /
-            2);
     Offset offsetWillbeValue =
         controller.centerOffset + (details.delta * controller.scale);
-    controller.centerOffset = Offset(
-        math.max(-panDxMaxValue, math.min(panDxMaxValue, offsetWillbeValue.dx)),
-        math.max(
-            -panDyMaxValue, math.min(panDyMaxValue, offsetWillbeValue.dy)));
+    if (offsetWillbeValue.dx.abs() >= panDxMaxValue) {
+      widget.pageController!.jumpTo(math.min(
+          (widget.pagesNum - 1) * ScreenUtils.width,
+          math.max(0, widget.pageController!.offset - details.delta.dx)));
+    } else {
+      controller.centerOffset = offsetWillbeValue;
+    }
   }
 
   void onHorizontalDragEnd(DragEndDetails details) {
-    if (widget.pageController != null &&
-        enablePageDrag != EnablePageDragDirection.none) {
+    // 换页的情况
+    if (widget.pageController != null) {
       if (widget.pageController!.offset +
               -details.velocity.pixelsPerSecond.dx / 10 >
           ScreenUtils.width * (page + 0.5)) {
@@ -393,7 +375,42 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
           ScreenUtils.width * widget.pagesNum) {
         widget.pageController!.animateToPage(widget.pagesNum - 1,
             duration: Duration(milliseconds: 250), curve: Curves.easeOut);
+      } else {
+        widget.pageController!.animateToPage(page.floor(),
+            duration: Duration(milliseconds: 250), curve: Curves.easeOut);
       }
+    }
+    // 处理滑动图片的加速度
+    if (dragAnimationController != null) {
+      Offset velocity = details.velocity.pixelsPerSecond;
+      Offset willbeOffset = controller.centerOffset + (velocity / 2);
+      double panDyMaxValue = math.max(
+          0,
+          (displayData!.displaySize.height * controller.scale -
+                  ScreenUtils.height) /
+              2);
+      double panDxMaxValue = math.max(
+          0,
+          (displayData!.displaySize.width * controller.scale -
+                  ScreenUtils.width) /
+              2);
+      dragAnimation =
+          Tween<Offset>(begin: controller.centerOffset, end: willbeOffset)
+              .animate(CurvedAnimation(
+                  parent: dragAnimationController!, curve: Curves.decelerate))
+                ..addListener(() {
+                  if (dragAnimation != null) {
+                    // Offset centerOffsetOldValue = controller.centerOffset;
+                    controller.centerOffset = Offset(
+                        math.max(-panDxMaxValue,
+                            math.min(panDxMaxValue, dragAnimation!.value.dx)),
+                        math.max(-panDyMaxValue,
+                            math.min(panDyMaxValue, dragAnimation!.value.dy)));
+                    // if (centerOffsetOldValue == controller.centerOffset)
+                    //   dragAnimationController!.stop();
+                  }
+                });
+      dragAnimationController!.forward(from: 0);
     }
   }
 
@@ -564,6 +581,7 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
                     math.max(-panDyMaxValue,
                         math.min(panDyMaxValue, controller.centerOffset.dy)));
                 controller.scale = doubleTapScaleAnimation!.value;
+                if (mounted) setState(() {});
               });
     doubleTapScaleAnimationController!.forward(from: 0);
   }
