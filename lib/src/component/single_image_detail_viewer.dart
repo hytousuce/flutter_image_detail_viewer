@@ -561,28 +561,30 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
             .animate(CurvedAnimation(
                 parent: doubleTapScaleAnimationController!,
                 curve: Curves.easeOut))
-              ..addListener(() {
-                if (doubleTapScaleAnimation == null) return;
-                double panDyMaxValue = math.max(
-                    0,
-                    (displayData!.displaySize.height *
-                                doubleTapScaleAnimation!.value -
-                            ScreenUtils.height) /
-                        2);
-                double panDxMaxValue = ((displayData!.displaySize.width *
-                                doubleTapScaleAnimation!.value -
-                            ScreenUtils.width) /
-                        2)
-                    .abs();
+              ..addListener(
+                () {
+                  if (doubleTapScaleAnimation == null) return;
+                  double panDyMaxValue = math.max(
+                      0,
+                      (displayData!.displaySize.height *
+                                  doubleTapScaleAnimation!.value -
+                              ScreenUtils.height) /
+                          2);
+                  double panDxMaxValue = math.max(
+                      0,
+                      (displayData!.displaySize.width *
+                                  doubleTapScaleAnimation!.value -
+                              ScreenUtils.width) /
+                          2);
 
-                controller.centerOffset = Offset(
-                    math.max(-panDxMaxValue,
-                        math.min(panDxMaxValue, controller.centerOffset.dx)),
-                    math.max(-panDyMaxValue,
-                        math.min(panDyMaxValue, controller.centerOffset.dy)));
-                controller.scale = doubleTapScaleAnimation!.value;
-                if (mounted) setState(() {});
-              });
+                  controller.centerOffset = Offset(
+                      math.max(-panDxMaxValue,
+                          math.min(panDxMaxValue, controller.centerOffset.dx)),
+                      math.max(-panDyMaxValue,
+                          math.min(panDyMaxValue, controller.centerOffset.dy)));
+                  controller.scale = doubleTapScaleAnimation!.value;
+                },
+              );
     doubleTapScaleAnimationController!.forward(from: 0);
   }
 
@@ -627,8 +629,7 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
         onScaleStart: onScaleStart,
         onScaleUpdate: onScaleUpdate,
         onScaleEnd: onScaleEnd(context),
-        // onPanUpdate: onPanUpdate,
-        // onPanEnd: onPanEnd(context),
+        onLongPress: widget.onLongPress,
         onTap: onTap(context),
         child: imageWarapper,
       );
