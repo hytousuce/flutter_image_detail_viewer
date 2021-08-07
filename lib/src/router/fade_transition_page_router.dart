@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_image_detail_viewer/src/image_detail_viewer.dart';
 import 'package:flutter_image_detail_viewer/src/option/image_detail_viewer_option.dart';
@@ -63,6 +66,10 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
+    if (Platform.isIOS) {
+      // 安卓平台如此会导致后层应用出现异常，故而暂时不进行此操作
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
     AnimationController barrierAnimationController =
         routerAnimationController ??
             AnimationController(
@@ -158,4 +165,13 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
 
   @override
   Duration get reverseTransitionDuration => Duration(milliseconds: 250);
+
+  @override
+  void dispose() {
+    if (Platform.isIOS) {
+      SystemChrome.setEnabledSystemUIOverlays(
+          [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+    }
+    super.dispose();
+  }
 }
