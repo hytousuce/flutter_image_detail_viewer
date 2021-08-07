@@ -106,10 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 showImageDetailViewer(
                   context,
                   routers: ImageDetailViewerRouters.blurTransition,
-                  initialPage: 1,
-                  onPageChanged: (int value) {
-                    print("~~~$value");
-                  },
                   options: [
                     ImageDetailViewerOption(
                       image: NetworkImage(
