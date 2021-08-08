@@ -44,6 +44,14 @@ class ImageDetailViewerOption {
   /// Hero 动画的标签，当提供时，图片控件外围将会被包裹一个 Hero Widget。
   final Object? heroTag;
 
+  /// Builder called when image is loading.
+  /// 图片加载时的build函数
+  final ImageLoadingBuilder? loadingBuilder;
+
+  /// Builder called when image has error when loading.
+  /// 图片加载出错时的build函数
+  final ImageErrorWidgetBuilder? errorWidgetBuilder;
+
   /// A default [ImageDetailViewerOption] constructor with an [ImageProvider].
   /// 使用提供的 [ImageProvider] 构建。
   ImageDetailViewerOption({
@@ -56,6 +64,8 @@ class ImageDetailViewerOption {
     this.onLongPress,
     this.enableGestures = true,
     this.heroTag,
+    this.loadingBuilder,
+    this.errorWidgetBuilder,
   }) : customBuilder = null;
 
   /// An [ImageDetailViewerOption] constructor with a custom builder.
