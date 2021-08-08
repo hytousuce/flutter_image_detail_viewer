@@ -193,6 +193,7 @@ Future<T?> showImageDetailViewer<T>(
   Widget Function(BuildContext)? frontWidgetBuilder,
   void Function(int)? onPageChanged,
   int? initialPage,
+  bool hideStatusBarWhenPushIn = false,
   RouteSettings? settings,
 }) {
   late PageRoute<T> usingRouter;
@@ -208,6 +209,7 @@ Future<T?> showImageDetailViewer<T>(
         initialPage: initialPage ?? 0,
         onPageChanged: onPageChanged,
         frontWidgetBuilder: frontWidgetBuilder,
+        hideStatusBarWhenPushIn: hideStatusBarWhenPushIn,
         routeSettings: settings,
       );
       break;
@@ -223,6 +225,7 @@ Future<T?> showImageDetailViewer<T>(
         blurMaxValue: blurMaxValue ?? 40.0,
         initialPage: initialPage ?? 0,
         onPageChanged: onPageChanged,
+        hideStatusBarWhenPushIn: hideStatusBarWhenPushIn,
         routeSettings: settings,
       );
       break;

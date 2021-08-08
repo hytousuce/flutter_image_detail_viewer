@@ -20,6 +20,7 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
   final double blurMaxValue;
   final void Function(int)? onPageChanged;
   final int initialPage;
+  final bool hideStatusBarWhenPushIn;
   final Key? key;
 
   ImageDetailViewerBlurPageRouter({
@@ -33,6 +34,7 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
     this.blurMaxValue = 40,
     this.onPageChanged,
     this.initialPage = 0,
+    this.hideStatusBarWhenPushIn = false,
     RouteSettings? routeSettings,
   })  : itemCount = null,
         builder = null,
@@ -50,6 +52,7 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
     this.blurMaxValue = 40,
     this.onPageChanged,
     this.initialPage = 0,
+    this.hideStatusBarWhenPushIn = false,
     RouteSettings? routeSettings,
   })  : options = null,
         super(settings: routeSettings);
@@ -69,7 +72,7 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    if (Platform.isIOS) {
+    if (Platform.isIOS && hideStatusBarWhenPushIn) {
       // 安卓平台如此会导致后层应用出现异常，故而暂时不进行此操作
       SystemChrome.setEnabledSystemUIOverlays([]);
     }
@@ -178,7 +181,7 @@ class ImageDetailViewerBlurPageRouter<T> extends PageRoute<T> {
 
   @override
   void dispose() {
-    if (Platform.isIOS) {
+    if (Platform.isIOS && hideStatusBarWhenPushIn) {
       SystemChrome.setEnabledSystemUIOverlays(
           [SystemUiOverlay.bottom, SystemUiOverlay.top]);
     }

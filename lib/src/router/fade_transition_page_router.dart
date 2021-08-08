@@ -19,6 +19,7 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
   final Widget Function(BuildContext context)? frontWidgetBuilder;
   final void Function(int)? onPageChanged;
   final int initialPage;
+  final bool hideStatusBarWhenPushIn;
   final Key? key;
 
   ImageDetailViewerFadePageRouter({
@@ -31,6 +32,7 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
     this.frontWidgetBuilder,
     this.onPageChanged,
     this.initialPage = 0,
+    this.hideStatusBarWhenPushIn = false,
     RouteSettings? routeSettings,
   })  : itemCount = null,
         builder = null,
@@ -47,6 +49,7 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
     this.key,
     this.onPageChanged,
     this.initialPage = 0,
+    this.hideStatusBarWhenPushIn = false,
     RouteSettings? routeSettings,
   })  : options = null,
         super(settings: routeSettings);
@@ -66,7 +69,7 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    if (Platform.isIOS) {
+    if (Platform.isIOS && hideStatusBarWhenPushIn) {
       // 安卓平台如此会导致后层应用出现异常，故而暂时不进行此操作
       SystemChrome.setEnabledSystemUIOverlays([]);
     }
@@ -168,7 +171,7 @@ class ImageDetailViewerFadePageRouter<T> extends PageRoute<T> {
 
   @override
   void dispose() {
-    if (Platform.isIOS) {
+    if (Platform.isIOS && hideStatusBarWhenPushIn) {
       SystemChrome.setEnabledSystemUIOverlays(
           [SystemUiOverlay.bottom, SystemUiOverlay.top]);
     }
