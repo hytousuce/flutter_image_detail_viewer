@@ -361,7 +361,13 @@ class _TypeTaggedImageState extends State<TypeTaggedImage> {
   Widget build(BuildContext context) {
     if (_lastException != null) {
       assert(widget.errorWidgetBuilder != null);
-      return widget.errorWidgetBuilder!(context, _lastException!, _lastStack);
+      return Container(
+        height: widget.height,
+        width: widget.width,
+        decoration: widget.decoration,
+        clipBehavior: widget.clipBehavior ?? Clip.none,
+        child: widget.errorWidgetBuilder!(context, _lastException!, _lastStack),
+      );
     }
     Widget image = Image(
       image: widget.image,
