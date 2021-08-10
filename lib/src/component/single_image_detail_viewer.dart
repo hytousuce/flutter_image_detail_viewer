@@ -332,6 +332,7 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
       widget.pageController!.jumpTo(math.min(
           (widget.pagesNum - 1) * ScreenUtils.width,
           math.max(0, widget.pageController!.offset - details.delta.dx)));
+      return;
     }
     double panDxMaxValue = math.max(
         0,
