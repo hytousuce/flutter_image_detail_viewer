@@ -336,6 +336,9 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
     if (dragAnimationController != null) {
       dragAnimationController!.stop();
     }
+    if (doubleTapScaleAnimationController != null) {
+      doubleTapScaleAnimationController!.stop();
+    }
   }
 
   void onHorizontalDragUpdate(DragUpdateDetails details) {
@@ -430,6 +433,9 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
 
     if (dragAnimationController != null) {
       dragAnimationController!.stop();
+    }
+    if (doubleTapScaleAnimationController != null) {
+      doubleTapScaleAnimationController!.stop();
     }
   }
 
@@ -536,10 +542,10 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   void onDoubleTap() {
     if (doubleTapScaleAnimationController == null) {
       return;
-    } else if ([AnimationStatus.completed, AnimationStatus.dismissed]
-            .indexOf(doubleTapScaleAnimationController!.status) ==
-        -1) {
-      doubleTapScaleAnimationController!.stop();
+    }
+    doubleTapScaleAnimationController!.stop();
+    if (dragAnimationController != null) {
+      dragAnimationController!.stop();
     }
     late double willScaleValue;
     if (state == ImageDetailViewerScaleState.initial) {
@@ -590,6 +596,23 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
 
   VoidCallback onTap(BuildContext context) {
     return () {
+      if (dragAnimationController != null)
+        print(dragAnimationController!.status);
+      if (doubleTapScaleAnimationController != null)
+        print(doubleTapScaleAnimationController!.status);
+      if ((dragAnimationController != null &&
+              [AnimationStatus.completed, AnimationStatus.dismissed]
+                      .indexOf(dragAnimationController!.status) ==
+                  -1) ||
+          (doubleTapScaleAnimationController != null &&
+              [AnimationStatus.completed, AnimationStatus.dismissed]
+                      .indexOf(doubleTapScaleAnimationController!.status) ==
+                  -1)) if (widget.routerAnimationController != null) {
+        // 结束未完成的动画
+        doubleTapScaleAnimationController!.stop();
+        dragAnimationController!.stop();
+        return;
+      }
       if (widget.routerAnimationController != null) {
         widget.routerAnimationController!.reverse();
       }
