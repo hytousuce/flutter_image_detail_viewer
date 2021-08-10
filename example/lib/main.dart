@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_image_detail_viewer/flutter_image_detail_viewer.dart';
 
@@ -108,19 +110,113 @@ class _MyHomePageState extends State<MyHomePage> {
                   routers: ImageDetailViewerRouters.blurTransition,
                   options: [
                     ImageDetailViewerOption(
-                      image: NetworkImage(
-                          'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'),
-                      // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'))
-                      // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'),
-                    ),
-                    ImageDetailViewerOption(image: NetworkImage(
-                        // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
-                        'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84')),
-                    // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe')),
-                    ImageDetailViewerOption(image: NetworkImage(
-                        // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
+                        image: NetworkImage('https://gimg2.baidu.com/'),
                         // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'))
-                        'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'))
+                        // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'),
+                        errorWidgetBuilder: (context, error, stack) {
+                          double errorImageHeight = min(
+                              MediaQuery.of(context).size.height,
+                              MediaQuery.of(context).size.width);
+                          return Container(
+                            child: Center(
+                              child: Container(
+                                height: errorImageHeight,
+                                width: errorImageHeight,
+                                color: Colors.grey,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      color: Colors.black,
+                                      height: errorImageHeight - 71,
+                                      width: errorImageHeight - 71,
+                                    ),
+                                    SizedBox(
+                                      height: 6,
+                                    ),
+                                    Text(
+                                      "加载失败",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                    ImageDetailViewerOption(
+                        image: NetworkImage(
+                            // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
+                            'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'),
+                        errorWidgetBuilder: (context, error, stack) {
+                          double errorImageHeight = min(
+                              MediaQuery.of(context).size.height,
+                              MediaQuery.of(context).size.width);
+                          return Container(
+                            color: Colors.grey,
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    color: Colors.black,
+                                    height: errorImageHeight - 71,
+                                    width: errorImageHeight - 71,
+                                  ),
+                                  SizedBox(
+                                    height: 6,
+                                  ),
+                                  Text(
+                                    "加载失败",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                    // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe')),
+                    ImageDetailViewerOption(
+                        image: NetworkImage(
+                            // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180103%2F87c6ca450dfb4f1bb13ed453846baea4.gif&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1629902401&t=17694de6eee21bca51929d9a50060fce'))
+                            // 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F400f4bf06fc2e1f280bbac9fc659adb3ae11241855ea6-uMdRUr_fw658&refer=http%3A%2F%2Fhbimg.b0.upaiyun.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630594064&t=f82ec1883c748b51efd788d4bed4bb84'))
+                            'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx2.sinaimg.cn%2Fmw690%2F006vb5Sqly1gruo0sfaxfj30u062wh0a.jpg&refer=http%3A%2F%2Fwx2.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630602421&t=8fa671fed3c8c2d4c94d2475d4eee6fe'),
+                        errorWidgetBuilder: (context, error, stack) {
+                          double errorImageHeight = min(
+                              MediaQuery.of(context).size.height,
+                              MediaQuery.of(context).size.width);
+                          return Container(
+                            color: Colors.grey,
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    color: Colors.black,
+                                    height: errorImageHeight - 71,
+                                    width: errorImageHeight - 71,
+                                  ),
+                                  SizedBox(
+                                    height: 6,
+                                  ),
+                                  Text(
+                                    "加载失败",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        })
                   ],
                 );
               },

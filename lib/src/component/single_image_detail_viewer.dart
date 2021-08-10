@@ -310,25 +310,10 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   late Offset startScalePointerOffset;
   late Offset scalePointerOldOffset;
   late bool disableDragToPop;
-  late EnablePageDragDirection enablePageDrag;
   late double page;
   late double originScrollOffset;
 
   void onHorizontalDragStart(DragStartDetails details) {
-    double panDxMaxValue = math.max(
-        0,
-        (displayData!.displaySize.width * controller.scale -
-                ScreenUtils.width) /
-            2);
-    if (controller.centerOffset.dx >= 0) {
-      enablePageDrag = panDxMaxValue - controller.centerOffset.dx < 10
-          ? EnablePageDragDirection.left
-          : EnablePageDragDirection.none;
-    } else {
-      enablePageDrag = controller.centerOffset.dx + panDxMaxValue > -10
-          ? EnablePageDragDirection.right
-          : EnablePageDragDirection.none;
-    }
     if (widget.pageController != null) {
       page = widget.pageController!.page!;
       originScrollOffset = widget.pageController!.offset;
@@ -342,6 +327,12 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   }
 
   void onHorizontalDragUpdate(DragUpdateDetails details) {
+    if (displayData == null) {
+      // onError 情况，仅允许左右划屏
+      widget.pageController!.jumpTo(math.min(
+          (widget.pagesNum - 1) * ScreenUtils.width,
+          math.max(0, widget.pageController!.offset - details.delta.dx)));
+    }
     double panDxMaxValue = math.max(
         0,
         (displayData!.displaySize.width * controller.scale -
@@ -383,6 +374,7 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
             duration: Duration(milliseconds: 250), curve: Curves.easeOut);
       }
     }
+    if (displayData == null) return;
     // 处理滑动图片的加速度
     if (dragAnimationController != null) {
       Offset velocity = details.velocity.pixelsPerSecond;
@@ -421,15 +413,20 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
     controllerScaleOldValue = controller.value.scale;
     startScalePointerOffset = details.focalPoint;
     scalePointerOldOffset = details.focalPoint;
-    double panDyMaxValue = math.max(
-        0,
-        (displayData!.displaySize.height * controller.scale -
-                ScreenUtils.height) /
-            2);
-    if ((controller.centerOffset.dy.abs() - panDyMaxValue).abs() < 10)
+    if (displayData == null) {
+      // onError 的情况，完全允许滑动退出
       disableDragToPop = false;
-    else
-      disableDragToPop = true;
+    } else {
+      double panDyMaxValue = math.max(
+          0,
+          (displayData!.displaySize.height * controller.scale -
+                  ScreenUtils.height) /
+              2);
+      if ((controller.centerOffset.dy.abs() - panDyMaxValue).abs() < 10)
+        disableDragToPop = false;
+      else
+        disableDragToPop = true;
+    }
 
     if (dragAnimationController != null) {
       dragAnimationController!.stop();
@@ -442,7 +439,12 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   void onScaleUpdate(ScaleUpdateDetails details) {
     Offset delta = details.focalPoint - scalePointerOldOffset;
     scalePointerOldOffset = details.focalPoint;
-    if (displayData == null) return;
+    if (displayData == null && widget.routerAnimationController != null) {
+      // onError 的情况，仅允许上下划退出
+      widget.routerAnimationController!.value -=
+          delta.dy / ScreenUtils.height / 2;
+      return;
+    }
     controller.scale = math.max(
         scaleBoundary.minScale,
         math.min(
@@ -483,7 +485,8 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   void Function(ScaleEndDetails) onScaleEnd(BuildContext context) {
     return (details) {
       double dragVelocity = details.velocity.pixelsPerSecond.dy;
-      if (state == ImageDetailViewerScaleState.initial &&
+      if ((state == ImageDetailViewerScaleState.initial ||
+              displayData == null) &&
           widget.routerAnimationController != null &&
           widget.routerAnimationController!.value != 0.5) {
         if ((widget.routerAnimationController!.value +
@@ -499,6 +502,7 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
           widget.routerAnimationController!.animateTo(0.5,
               duration: widget.routerAnimationController!.reverseDuration);
         }
+        if (displayData == null) return;
       }
       if (dragAnimationController != null) {
         Offset velocity = details.velocity.pixelsPerSecond;
@@ -540,6 +544,7 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
   AnimationController? dragAnimationController;
 
   void onDoubleTap() {
+    if (displayData == null) return;
     if (doubleTapScaleAnimationController == null) {
       return;
     }
@@ -627,16 +632,19 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
 
   @override
   Widget build(BuildContext context) {
+    Widget imageWarapper;
     if (_lastException != null) {
       assert(widget.errorWidgetBuilder != null);
-      return widget.errorWidgetBuilder!(context, _lastException!, _lastStack);
+      imageWarapper =
+          widget.errorWidgetBuilder!(context, _lastException!, _lastStack);
+    } else {
+      imageWarapper = SingleImageWrapper(
+        widget.image,
+        controller,
+        displayData,
+        heroTag: widget.heroTag,
+      );
     }
-    Widget imageWarapper = SingleImageWrapper(
-      widget.image,
-      controller,
-      displayData,
-      heroTag: widget.heroTag,
-    );
 
     if (widget.enableGestures) {
       imageWarapper = GestureDetector(

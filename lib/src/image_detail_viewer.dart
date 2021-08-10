@@ -145,6 +145,8 @@ class _ImageDetailViewerState extends State<ImageDetailViewer> {
           enablePageWarp: enablePageWarp,
           pageController: _pageController,
           pagesNum: optionList.length,
+          loadingBuilder: item.loadingBuilder,
+          errorWidgetBuilder: item.errorWidgetBuilder,
         ));
       } else {
         // assert(item.customBuilder != null);
