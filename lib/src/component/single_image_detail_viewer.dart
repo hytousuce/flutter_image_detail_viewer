@@ -596,10 +596,6 @@ class _SingleImageDetailViewerChild extends State<SingleImageDetailViewer>
 
   VoidCallback onTap(BuildContext context) {
     return () {
-      if (dragAnimationController != null)
-        print(dragAnimationController!.status);
-      if (doubleTapScaleAnimationController != null)
-        print(doubleTapScaleAnimationController!.status);
       if ((dragAnimationController != null &&
               [AnimationStatus.completed, AnimationStatus.dismissed]
                       .indexOf(dragAnimationController!.status) ==
